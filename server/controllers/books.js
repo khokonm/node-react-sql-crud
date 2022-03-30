@@ -1,3 +1,4 @@
+const response = require("../utils/response");
 const db = require("../utils/db");
 exports.list = (req, res) => {
     const page = req.params.page ? req.params.page : 1;
@@ -6,22 +7,14 @@ exports.list = (req, res) => {
     db.all(
         `SELECT * FROM books LIMIT ${limit} OFFSET ${offset}`,
         (err, rows) => {
-            if (err) {
-                res.status(500).send("Error");
-            } else {
-                res.status(200).json(rows);
-            }
+            response(res, err, rows);
         }
     );
 };
 exports.singleBook = (req, res) => {
     const { id } = req.params;
     db.get(`SELECT * FROM books WHERE id = ${id}`, (err, row) => {
-        if (err) {
-            res.status(500).send("Error");
-        } else {
-            res.status(200).json(row);
-        }
+        response(res, err, row);
     });
 };
 exports.addBook = (req, res) => {
@@ -30,11 +23,7 @@ exports.addBook = (req, res) => {
         "INSERT INTO books(name,image,author,price,isbn) VALUES(?,?,?,?,?)",
         [name, image, author, price, isbn],
         (err) => {
-            if (err) {
-                res.status(500).send("Error");
-            } else {
-                res.status(200).send("Success");
-            }
+            response(res, err);
         }
     );
 };
@@ -43,32 +32,19 @@ exports.partialUpdate = (req, res) => {
     const keys = Object.keys(update);
     const values = keys.map((key) => update[key]);
     const columns = keys.join("=?,") + "=?";
-    console.log(keys);
     db.run(`UPDATE books SET ${columns} WHERE id=?`, [...values, id], (err) => {
-        if (err) {
-            res.status(500).send("Error");
-        } else {
-            res.status(200).send("Success");
-        }
+        response(res, err);
     });
 };
 exports.updatePhoto = (req, res) => {
     const { id, image } = req.body;
     db.run("UPDATE books SET image=? WHERE id=?", [image, id], (err) => {
-        if (err) {
-            res.status(500).send("Error");
-        } else {
-            res.status(200).send("Success");
-        }
+        response(res, err);
     });
 };
 exports.deleteBook = (req, res) => {
     const { id } = req.body;
     db.run("DELETE FROM books WHERE id=?", [id], (err) => {
-        if (err) {
-            res.status(500).send("Error");
-        } else {
-            res.status(200).send("Success");
-        }
+        response(res, err);
     });
 };
