@@ -17,6 +17,15 @@ exports.singleBook = (req, res) => {
         response(res, err, row);
     });
 };
+exports.search = (req, res) => {
+    const { query } = req.params;
+    db.all(
+        `SELECT * FROM books WHERE title LIKE '%${query}%' OR author LIKE '%${query}%'`,
+        (err, rows) => {
+            response(res, err, rows);
+        }
+    );
+};
 exports.addBook = (req, res) => {
     const { name, image, author, price, isbn } = req.body;
     db.run(
