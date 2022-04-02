@@ -1,9 +1,23 @@
 import React from 'react'
+import {BrowserRouter, Route,  Routes} from "react-router-dom";
+import Home from './pages/Home'
+import Add from './pages/Add'
+import Edit from './pages/Edit'
+import Search from './pages/Search'
 const App = () => {
     return (
-        <div>
-        <h1>Hello World</h1>
-        </div>
+        <BrowserRouter>
+            <Routes>
+                <Route path="/add" element={<Add />}>
+                </Route>
+                <Route path="/edit/:id" element={<Edit />}>
+                </Route>
+                <Route path="/search" element={<Search />}>
+                </Route>
+                <Route path="/" element={<Home />}>
+                </Route>
+            </Routes>
+        </BrowserRouter>
     )
 }
 export default App
