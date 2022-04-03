@@ -14,7 +14,7 @@ import {
 import { Visibility, Edit, Delete } from '@material-ui/icons'
 import { Link } from "react-router-dom";
 import BookDescription from "./bookDescription";
-
+import { SERVER_URL } from "../lib/config";
 const BookCard = ({ index, book, initDelete }) => {
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
@@ -31,7 +31,7 @@ const BookCard = ({ index, book, initDelete }) => {
                         component="img"
                         alt={book.name}
                         height="140"
-                        image={book.image}
+                        image={book.image ? `${SERVER_URL}/uploads/${book.image}` : "https://via.placeholder.com/150"}
                         title={book.name}
                     />
                     <CardContent>

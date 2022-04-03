@@ -1,5 +1,4 @@
 import React from 'react'
-import { useState, useEffect } from 'react'
 import BookCard from './bookCard'
 import { confirmAlert } from 'react-confirm-alert'; 
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
@@ -8,7 +7,7 @@ const RenderBooks = ({allBooks, setAllBooks}) =>{
     const deleteBook = (id) =>{
         confirmAlert({
             title: 'Confirm to delete',
-            message: 'Are you sure to delet this book?',
+            message: 'Are you sure to delete this book?',
             buttons: [
               {
                 label: 'Yes',

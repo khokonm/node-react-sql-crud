@@ -28,15 +28,24 @@ const Edit = () => {
         }
         let response = await baseAPI.put(`/books/partialUpdate/${id}`,data)
         setLoading(false)
-        if(response.status === 200){
-            setMsg("Updated Successfully")
+        if(response.data){
+            setMsg(response.data.message)
         }
     }
-    const updateImage = () =>{
+    const updateImage = async () =>{
         setLoading(true)
         const data = new FormData()
         data.append('file',image)
-        // function to update the image
+        try{
+            let response = await baseAPI.put(`/books/imageUpdate/${id}`,data)
+            setLoading(false)
+            if(response.data){
+                setMsg(response.data.message)
+            }
+        }catch(err){
+            setLoading(false)
+            setMsg(err.response.data.message)
+        }
     }
     const loadInfo = async () =>{
         let response = await baseAPI.get(`/books/details/${id}`)
