@@ -1,39 +1,36 @@
 import React from "react";
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Typography, CssBaseline, Grid, Container } from "@material-ui/core";
 import { Link, useParams } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import Box from '@material-ui/core/Box';
 import TextField from '@material-ui/core/TextField';
-import TextareaAutosize from '@material-ui/core/TextareaAutosize';
+import baseAPI from "../lib/baseAPI";
 const Edit = () => {
     const {id} = useParams();
     const [name, setName] = useState( "" );
     const [author, setAuthor] = useState( "" );
     const [image, setImage] = useState( null );
     const [price, setPrice] = useState( "" );
-    const [description,setDescrption] = useState('')
     const [isbn, setISBN] = useState( "" );
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState(false);
     const addImage = (event) =>{
         setImage(event.target.files[0])
     }
-    const addNew = () =>{
-        setImage(null)
-        setLoading(false)
-        setMsg(false)
-        setDescrption("")
-    }
-    const updateBook = () =>{
+    const updateBook = async () =>{
         setLoading(true)
-        const data = new FormData()
-        data.append('description',description)
-        data.append('name',name)
-        data.append('author',author)
-        data.append('price',price)
-        data.append('isbn',isbn)
-        // function to update the book
+        const data = {
+            name,
+            author,
+            price,
+            isbn
+        }
+        let response = await baseAPI.put(`/books/partialUpdate/${id}`,data)
+        setLoading(false)
+        if(response.status === 200){
+            setMsg("Updated Successfully")
+        }
     }
     const updateImage = () =>{
         setLoading(true)
@@ -41,6 +38,17 @@ const Edit = () => {
         data.append('file',image)
         // function to update the image
     }
+    const loadInfo = async () =>{
+        let response = await baseAPI.get(`/books/details/${id}`)
+        setName(response.data.name)
+        setAuthor(response.data.author)
+        setImage(response.data.image)
+        setPrice(response.data.price)
+        setISBN(response.data.isbn)
+    }
+    useEffect( () => {
+        loadInfo()
+    }, [])
     return (
         <>
             <CssBaseline />
@@ -54,7 +62,16 @@ const Edit = () => {
                     >
                         Edit Book #{id}
                     </Typography>
-                    
+                    {msg && 
+                    <Typography
+                        variant="h5"
+                        align="center"
+                        color="textSecondary"
+                        paragraph
+                    >
+                        {msg}
+                    </Typography>
+                    }
                 </Container>
                 <Container maxWidth="md" style={{ marginTop: "20px" }}>
                     <Grid container spacing={3} justify="center">
@@ -65,18 +82,10 @@ const Edit = () => {
                             margin: "20px 0"
                         }}
                         >
-                            <TextField fullWidth label="Book Name" onChange={(e)=>setName(e.target.value)}/>
-                            <TextField fullWidth label="Author Name" onChange={(e)=>setAuthor(e.target.value)}/>
-                            <TextField fullWidth label="Price" onChange={(e)=>setPrice(e.target.value)}/>
-                            <TextareaAutosize
-                            aria-label="description"
-                            minRows={3}
-                            placeholder="Description (Markdown supported)"
-                            style={{ width: "100%", marginTop: "20px" }}
-                            onChange={(e)=>setDescrption(e.target.value)} 
-                            value={description}
-                            />
-                            <TextField fullWidth label="ISBN" onChange={(e)=>setISBN(e.target.value)}/>
+                            <TextField fullWidth label="Book Name" value={name} onChange={(e)=>setName(e.target.value)}/>
+                            <TextField fullWidth label="Author Name" value={author} onChange={(e)=>setAuthor(e.target.value)}/>
+                            <TextField fullWidth label="Price" value={price} onChange={(e)=>setPrice(e.target.value)}/>
+                            <TextField fullWidth label="ISBN" value={isbn} onChange={(e)=>setISBN(e.target.value)}/>
                         </Box>
                     </Grid>
                     <Grid container spacing="2" justify="center">

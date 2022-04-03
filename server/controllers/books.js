@@ -20,7 +20,7 @@ exports.singleBook = (req, res) => {
 exports.search = (req, res) => {
     const { query } = req.params;
     db.all(
-        `SELECT * FROM books WHERE title LIKE '%${query}%' OR author LIKE '%${query}%'`,
+        `SELECT * FROM books WHERE name LIKE '%${query}%' OR author LIKE '%${query}%'`,
         (err, rows) => {
             response(res, err, rows);
         }
@@ -37,7 +37,8 @@ exports.addBook = (req, res) => {
     );
 };
 exports.partialUpdate = (req, res) => {
-    const { id, ...update } = req.body;
+    const { id } = req.params;
+    const { ...update } = req.body;
     const keys = Object.keys(update);
     const values = keys.map((key) => update[key]);
     const columns = keys.join("=?,") + "=?";
@@ -52,7 +53,7 @@ exports.updatePhoto = (req, res) => {
     });
 };
 exports.deleteBook = (req, res) => {
-    const { id } = req.body;
+    const { id } = req.params;
     db.run("DELETE FROM books WHERE id=?", [id], (err) => {
         response(res, err);
     });

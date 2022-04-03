@@ -1,10 +1,28 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import { Typography, CssBaseline, Grid, Container } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import Button from "@material-ui/core/Button";
-import BookCard from "../components/bookCard";
-import { Search, ArrowBack, ArrowForward } from '@material-ui/icons';
+import { Search } from '@material-ui/icons';
+import http from "../lib/baseAPI";
+import RenderBooks from "../components/renderBooks";
 const Home = () => {
+    const [allBooks, setAllBooks] = useState([]);
+    const [page, setPage] = useState(1)
+    const [allLoaded,setAllLoaded] = useState(false)
+
+    const loadBooks = async () =>{
+        let response = await http.get(`/books/${page}`)
+        
+        if(response.data.length < 5){
+            setAllLoaded(true)
+        }
+        setAllBooks([...allBooks,...response.data])
+        setPage(page+1)
+    }
+    useEffect(() => {
+        loadBooks()
+    }, [])
     return (
         <>
             <CssBaseline />
@@ -46,25 +64,25 @@ const Home = () => {
                 </Container>
                 <Container maxWidth="md" style={{ marginTop: "20px" }}>
                     <Grid container spacing={3} justify="center">
-                        <BookCard />
-                        <BookCard />
-                        <BookCard />
-                        <BookCard />
-                        <BookCard />
+                        <RenderBooks allBooks={allBooks} setAllBooks={setAllBooks}/>
                     </Grid>
                 </Container>
+                
                 <Container maxWidth="sm" style={{ marginTop: "50px" }}>
                     <Grid container spacing="2" justify="center">
+                    {allLoaded ?
                         <Grid item>
-                            <Button variant="contained" color="primary">
-                                <ArrowBack />
+                            <Button variant="contained" color="primary" disabled onClick={()=>loadBooks()}>
+                                All Books Loaded
                             </Button>
                         </Grid>
+                        :
                         <Grid item>
-                            <Button variant="contained" color="primary">
-                                <ArrowForward />
+                            <Button variant="contained" color="primary" onClick={()=>loadBooks()}>
+                                Load More
                             </Button>
                         </Grid>
+                    }
                     </Grid>
                 </Container>
             </main>

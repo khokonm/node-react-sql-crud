@@ -1,20 +1,36 @@
 import React from "react";
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Typography, CssBaseline, Grid, Container } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import Box from '@material-ui/core/Box';
 import TextField from '@material-ui/core/TextField';
-import BookCard from "../components/bookCard";
+import RenderBooks from "../components/renderBooks";
+import debounce from 'lodash.debounce'
+import baseAPI from "../lib/baseAPI";
 const Search = () => {
-    
+    const [allBooks, setAllBooks] = useState([]);
     const [query, setQuery] = useState( "" );
     const [loading, setLoading] = useState(false);
     const [loaded, setLoaded] = useState(false);
-    const submitSearch = () =>{
-        setLoading(true)
-        // function to submit the search
-    }
+    const submitSearch = useCallback(
+        debounce(async (query) =>{
+            if(query.length >= 3){
+                setLoading(true)
+                let response = await baseAPI.get(`/books/search/${query}`)
+                setLoading(false)
+                setLoaded(true)
+                setQuery(query)
+                setAllBooks(response.data)
+            }
+        }
+        ,500),
+        []
+    )
+
+    useEffect(()=>{
+        submitSearch(query)
+    },[query])
     return (
         <>
             <CssBaseline />
@@ -44,22 +60,15 @@ const Search = () => {
                             loading ? 
                             <div>
                                 {
-                                    !loaded ?
+                                    !loaded &&
                                     <div>
                                         <h2>Searching, please wait...</h2>
-                                    </div>
-                                    :
-                                    <div>
-                                        <h2>{loaded}</h2>
                                     </div>
                                 }
                             </div>  
                         :
                         <Grid container spacing="2" justify="center" style={{margin: '20px 0'}}>
-                            <BookCard />
-                            <BookCard />
-                            <BookCard />
-                            <BookCard />
+                            <RenderBooks allBooks={allBooks} setAllBooks={setAllBooks}/>
                         </Grid>
                         }
                     </Grid>
